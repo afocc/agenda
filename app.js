@@ -12,9 +12,9 @@ app.get("/", (req, res) => {
 
 app.get("/alunos", async (req, res) => {
     try {
-    const alunos = await pool.query("SELECT * FROM alunos")
-    console.log(alunos)
-    res.json(alunos.rows)
+        const alunos = await pool.query("SELECT * FROM alunos")
+        console.log(alunos)
+        res.json(alunos.rows)
     }
     catch(erro){
         console.log(erro)
@@ -40,4 +40,6 @@ app.delete("/alunos/:id_aluno", (req, res) => {
     });
 })
 
-app.listen(3000)
+app.listen(3000, () => {
+    console.log("Servidor rodando")
+})
