@@ -1,7 +1,7 @@
-# FROM node:21
+FROM node:21
 
-# WORKDIR /usr/app
-# COPY . .
-# #RUN npm install
-# # ADD . /usr/app
-# CMD npm run dev
+WORKDIR /usr/app
+COPY . .
+#RUN npm install
+# ADD . /usr/app
+CMD npm run dev
