@@ -5,6 +5,7 @@ services:
  
   postgresdb:
     image: postgres
+    container_name: postgresql
     restart: unless-stopped
     env_file: ./.env
     environment: 
@@ -17,6 +18,7 @@ services:
       - db:/var/lib/postgres
 
   app:
+    container_name: agenda
     depends_on:
       - postgresdb
     build: 
