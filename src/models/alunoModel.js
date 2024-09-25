@@ -5,8 +5,7 @@ const getAlunos = async () => {
 };
 
 const createAluno = async (nome, cpf, email, datanascimento) => {
-    try {
-    
+    try {    
     await pool.query("SELECT setval('alunos_id_seq', (SELECT COALESCE(MAX(id), 1) FROM alunos))");
     return await pool.query(
         "INSERT INTO alunos (nome, cpf, email, datanascimento) VALUES ($1, $2, $3, $4) RETURNING id",

@@ -1,7 +1,9 @@
-const express = require("express")
+const express = require("express");
 const pool = require('./db');
-const app = express()
+const app = express();
 const port = 3000;
+const host = '0.0.0.0';
+
 const alunosController = require('./src/controllers/alunosController');
 
 app.use(express.json());
@@ -13,6 +15,7 @@ app.get("/", (req, res) => {
 })
 
 app.get("/alunos", alunosController.getAlunos);
+
 app.get("/alunos/:id", alunosController.getAlunosById);
 
 app.post("/alunos", alunosController.createAluno);
@@ -23,6 +26,6 @@ app.delete("/alunos/:id", alunosController.deleteAluno);
 
    
 
-app.listen(port, () => {
-    console.log("Servidor rodando")
+app.listen(port, host, () => {
+    console.log(`Servidor rodando na porta ${port}`);
 });

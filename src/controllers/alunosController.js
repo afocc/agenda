@@ -18,8 +18,12 @@ exports.createAluno = async (req, res) => {
 
     let { nome, cpf, email, datanascimento } = req.body;
 
-    cpf = cpf.replaceAll('.', '');
-    cpf = cpf.replaceAll('-', '');
+    cpf = cpf.replaceAll('.', '').replaceAll('-', '');
+    if (cpf.length != 11) {
+        return res.status(400).json({message: 'Tamanho do CPF inválido'})
+    }
+
+    
 
     if (!nome || !cpf || !email || !datanascimento) {
         return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
