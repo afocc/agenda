@@ -18,16 +18,32 @@ exports.createAluno = async (req, res) => {
 
     let { nome, cpf, email, datanascimento } = req.body;
 
+   
+    if (!nome || !cpf || !email || !datanascimento) {
+        return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
+    }
+
+    if (nome.length < 3) {
+        return res.status(400).json({ message: 'O nome deve ter pelo menos 3 letras' });
+    }
+
+    if (!/^[A-Z][a-z]*$/.test(nome)) {
+        return res.status(400).json({ message: 'O nome deve começar com letra maiúscula' });
+    }
+
     cpf = cpf.replaceAll('.', '').replaceAll('-', '');
     if (cpf.length != 11) {
         return res.status(400).json({message: 'Tamanho do CPF inválido'})
     }
-
     
-
-    if (!nome || !cpf || !email || !datanascimento) {
-        return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({message: 'Email inválido'});
     }
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(datanascimento)) {
+        return res.status(400).json({ message: 'Formato de data inválido. Use YYYY-MM-DD.' });
+    }
+
 
     try {
         const novoAluno = await alunoModel.createAluno(nome, cpf, email, datanascimento);
@@ -43,10 +59,10 @@ exports.createAluno = async (req, res) => {
 exports.getAlunosById = async (req, res) => {
     try {
         const result = await alunoModel.getAlunosById(req.params.id);
-        const alunos = result.rows.map(aluno => ({
-            ...aluno,
-            datanascimento: aluno.datanascimento.toISOString().split('T')[0]
-        }));
+        // // const alunos = result.rows.map(aluno => ({
+        // //     ...aluno,
+        // //     datanascimento: aluno.datanascimento.toISOString().split('T')[0]
+        // }));
         res.status(200).json(alunos);
     } catch (error) {
         console.error('Erro ao buscar alunos:', error);
