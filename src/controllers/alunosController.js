@@ -1,8 +1,10 @@
 const alunoModel = require('../models/alunoModel');
+const { validarAluno, validaCpf } = require('../validacoes/validacoes')
 
 exports.getAlunos = async (req, res) => {
     try {
         const alunos = await alunoModel.getAlunos();
+        // Código para formatar a data de nascimento
         // const alunos = result.rows.map(aluno => ({
         //     ...aluno,
         //     datanascimento: aluno.datanascimento.toISOString().split('T')[0]
@@ -18,30 +20,18 @@ exports.createAluno = async (req, res) => {
 
     let { nome, cpf, email, datanascimento } = req.body;
 
-   
-    if (!nome || !cpf || !email || !datanascimento) {
-        return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
+    if (!req.body) {
+        return res.status(400).json({ message: 'Nenhum dado enviado' });
     }
 
-    if (nome.length < 3) {
-        return res.status(400).json({ message: 'O nome deve ter pelo menos 3 letras' });
-    }
-
-    if (!/^[A-Z][a-z]*$/.test(nome)) {
-        return res.status(400).json({ message: 'O nome deve começar com letra maiúscula' });
-    }
-
-    cpf = cpf.replaceAll('.', '').replaceAll('-', '');
-    if (cpf.length != 11) {
-        return res.status(400).json({message: 'Tamanho do CPF inválido'})
-    }
+    const erroAluno = validarAluno(req.body);
     
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        return res.status(400).json({message: 'Email inválido'});
+    if (erroAluno) {
+        return res.status(400).json({ message: erroAluno });
     }
 
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(datanascimento)) {
-        return res.status(400).json({ message: 'Formato de data inválido. Use YYYY-MM-DD.' });
+    if (!validaCpf(req.body.cpf)) {
+        return res.status(400).json({ message: 'CPF inválido' });
     }
 
 
@@ -52,9 +42,37 @@ exports.createAluno = async (req, res) => {
     } catch (error) {
         console.error('Erro ao criar aluno:', error);
         res.status(500).json({ message: 'Erro ao criar aluno' });
-    }
+    };
+}
+    // if (!nome || !cpf || !email || !datanascimento) {
+    //     return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
+    // }
 
-};
+    // if (nome.length < 3) {
+    //     return res.status(400).json({ message: 'O nome deve ter pelo menos 3 letras' });
+    // }
+
+    // if (!/^[A-Z][a-z]*$/.test(nome)) {
+    //     return res.status(400).json({ message: 'O nome deve começar com letra maiúscula' });
+    // }
+
+    // cpf = cpf.replaceAll('.', '').replaceAll('-', '');
+    // if (cpf.length != 11) {
+    //     return res.status(400).json({message: 'Tamanho do CPF inválido'})
+    // }
+    
+    // if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    //     return res.status(400).json({message: 'Email inválido'});
+    // }
+
+    // if (!/^\d{4}-\d{2}-\d{2}$/.test(datanascimento)) {
+    //     return res.status(400).json({ message: 'Formato de data inválido. Use YYYY-MM-DD.' });
+    // }
+
+
+    
+
+
 
 exports.getAlunosById = async (req, res) => {
     try {
@@ -72,21 +90,27 @@ exports.getAlunosById = async (req, res) => {
 
 exports.updateAluno = async (req, res) => {
     const alunoId = req.params.id;
-    const { nome, cpf, email, datanascimento } = req.body;
+    let { nome, cpf, email, datanascimento } = req.body;
 
-    if (!nome || !cpf || !email || !datanascimento) {
-        return res.status(400).json({ message: 'Todos os campos (nome, cpf, email, datanascimento) são obrigatórios' });
+    if (!req.body) {
+        return res.status(400).json({ message: 'Nenhum dado enviado' });
+    }
+
+    const erroAluno = validarAluno(req.body);
+    
+    if (erroAluno) {
+        return res.status(400).json({ message: erroAluno });
+    }
+
+    if (!validaCpf(req.body.cpf)) {
+        return res.status(400).json({ message: 'CPF inválido' });
     }
 
     try {
-        const aluno = await pool.query("SELECT * FROM alunos WHERE id = $1", [alunoId]);
-
-        if (aluno.rows.length === 0) {
+        const aluno = alunoModel.updateAluno(alunoId, nome, cpf, email, datanascimento);
+        if (aluno.rowsCount === 0) {
             return res.status(404).json({ message: 'Aluno não encontrado' });
-        }
-
-        alunoModel.updateAluno(alunoId, nome, cpf, email, datanascimento)
-
+        }     
         res.status(200).json({ message: `Aluno com ID ${alunoId} atualizado com sucesso` });
 
     } catch (error) {

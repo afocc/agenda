@@ -20,6 +20,7 @@ const getAlunoById = async (id) => {
 };
 
 const updateAluno = async (id, nome, cpf, email, datanascimento) => {
+    console.log(id);
     return await pool.query(
         "UPDATE alunos SET nome = $1, cpf = $2, email = $3, datanascimento = $4 WHERE id = $5",
         [nome, cpf, email, datanascimento, id]
