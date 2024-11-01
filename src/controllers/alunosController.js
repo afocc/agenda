@@ -1,14 +1,9 @@
-const alunoModel = require('../models/alunoModel');
+const alunosModel = require('../models/alunosModel');
 const { validarAluno, validaCpf } = require('../validacoes/validacoes')
 
 exports.getAlunos = async (req, res) => {
     try {
-        const alunos = await alunoModel.getAlunos();
-        // Código para formatar a data de nascimento
-        // const alunos = result.rows.map(aluno => ({
-        //     ...aluno,
-        //     datanascimento: aluno.datanascimento.toISOString().split('T')[0]
-        // }));
+        const alunos = await alunosModel.getAlunos();
         res.status(200).json(alunos.rows);
     } catch (error) {
         console.error('Erro ao buscar alunos:', error);
@@ -16,80 +11,17 @@ exports.getAlunos = async (req, res) => {
     }
 };
 
-exports.createAluno = async (req, res) => { 
-
-    let { nome, cpf, email, datanascimento } = req.body;
-
-    if (!req.body) {
-        return res.status(400).json({ message: 'Nenhum dado enviado' });
-    }
-
-    const erroAluno = validarAluno(req.body);
-    
-    if (erroAluno) {
-        return res.status(400).json({ message: erroAluno });
-    }
-
-    if (!validaCpf(req.body.cpf)) {
-        return res.status(400).json({ message: 'CPF inválido' });
-    }
-
-
+exports.getAlunoById = async (req, res) => {
     try {
-        const novoAluno = await alunoModel.createAluno(nome, cpf, email, datanascimento);
-        const alunoId = novoAluno.rows[0].id;
-        res.status(201).json({ message: `Aluno criado com sucesso`, id: alunoId });
-    } catch (error) {
-        console.error('Erro ao criar aluno:', error);
-        res.status(500).json({ message: 'Erro ao criar aluno' });
-    };
-}
-    // if (!nome || !cpf || !email || !datanascimento) {
-    //     return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
-    // }
-
-    // if (nome.length < 3) {
-    //     return res.status(400).json({ message: 'O nome deve ter pelo menos 3 letras' });
-    // }
-
-    // if (!/^[A-Z][a-z]*$/.test(nome)) {
-    //     return res.status(400).json({ message: 'O nome deve começar com letra maiúscula' });
-    // }
-
-    // cpf = cpf.replaceAll('.', '').replaceAll('-', '');
-    // if (cpf.length != 11) {
-    //     return res.status(400).json({message: 'Tamanho do CPF inválido'})
-    // }
-    
-    // if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    //     return res.status(400).json({message: 'Email inválido'});
-    // }
-
-    // if (!/^\d{4}-\d{2}-\d{2}$/.test(datanascimento)) {
-    //     return res.status(400).json({ message: 'Formato de data inválido. Use YYYY-MM-DD.' });
-    // }
-
-
-    
-
-
-
-exports.getAlunosById = async (req, res) => {
-    try {
-        const result = await alunoModel.getAlunosById(req.params.id);
-        // // const alunos = result.rows.map(aluno => ({
-        // //     ...aluno,
-        // //     datanascimento: aluno.datanascimento.toISOString().split('T')[0]
-        // }));
-        res.status(200).json(alunos);
+        const aluno = await alunosModel.getAlunoById(req.params.id);
+        res.status(200).json(aluno);
     } catch (error) {
         console.error('Erro ao buscar alunos:', error);
         res.status(500).json({ message: 'Erro ao buscar alunos' });
     }
 };
 
-exports.updateAluno = async (req, res) => {
-    const alunoId = req.params.id;
+exports.createAluno = async (req, res) => { 
     let { nome, cpf, email, datanascimento } = req.body;
 
     if (!req.body) {
@@ -107,11 +39,39 @@ exports.updateAluno = async (req, res) => {
     }
 
     try {
-        const aluno = alunoModel.updateAluno(alunoId, nome, cpf, email, datanascimento);
+        const novoAluno = await alunosModel.createAluno(nome, cpf, email, datanascimento);
+        const idAluno = novoAluno.rows[0].id;
+        res.status(201).json({ message: `Aluno criado com sucesso`, id: idAluno });
+    } catch (error) {
+        console.error('Erro ao criar aluno:', error);
+        res.status(500).json({ message: 'Erro ao criar aluno' });
+    };
+}
+    
+exports.updateAluno = async (req, res) => {    
+    const idAluno = req.params.id;
+    let { nome, cpf, email, datanascimento } = req.body;
+
+    if (!req.body) {
+        return res.status(400).json({ message: 'Nenhum dado enviado' });
+    }
+
+    const erroAluno = validarAluno(req.body);
+    
+    if (erroAluno) {
+        return res.status(400).json({ message: erroAluno });
+    }
+
+    if (!validaCpf(req.body.cpf)) {
+        return res.status(400).json({ message: 'CPF inválido' });
+    }
+
+    try {
+        const aluno = alunosModel.updateAluno(idAluno, nome, cpf, email, datanascimento);
         if (aluno.rowsCount === 0) {
             return res.status(404).json({ message: 'Aluno não encontrado' });
         }     
-        res.status(200).json({ message: `Aluno com ID ${alunoId} atualizado com sucesso` });
+        res.status(200).json({ message: `Aluno com ID ${idAluno} atualizado com sucesso` });
 
     } catch (error) {
         console.error('Erro ao atualizar aluno:', error);
@@ -120,16 +80,15 @@ exports.updateAluno = async (req, res) => {
 };
 
 exports.deleteAluno = async (req, res) => {  
-    const alunoId = req.params.id;
-    console.log('ID do aluno a ser excluído:', alunoId);
+    const idAluno = req.params.id;
+    console.log('ID do aluno a ser excluído:', idAluno);
 
     try {
-        alunoModel.deleteAluno(alunoId);
-        res.status(200).json({message: `Aluno ${alunoId} excluído com sucesso` }); 
+        alunosModel.deleteAluno(idAluno);
+        res.status(200).json({message: `Aluno ${idAluno} excluído com sucesso` }); 
 
     } catch (error) {
         console.error('Erro ao excluir aluno:', error);
         res.status(500).json({ message: 'Erro ao excluir aluno' });
     }
-
 };

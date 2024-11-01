@@ -4,27 +4,25 @@ const app = express();
 const port = 3000;
 const host = '0.0.0.0';
 
-const alunosController = require('./src/controllers/alunosController');
+const packageJson = require("./package.json");
+
+const alunosRoutes = require('./src/routes/alunosRoutes');
+const cursosRoutes = require('./src/routes/cursosRoutes');
+const disciplinasRoutes = require('./src/routes/disciplinasRoutes');
+const professoresRoutes = require('./src/routes/professoresRoutes');
+const turmasRoutes = require('./src/routes/turmasRoutes');
 
 app.use(express.json());
 
-const packageJson = require("./package.json");
+app.use('/alunos', alunosRoutes);
+app.use('/cursos', cursosRoutes);
+app.use('/disciplinas', disciplinasRoutes);
+app.use('/professores', professoresRoutes);
+app.use('/turmas', turmasRoutes);
 
 app.get("/", (req, res) => {
     res.send("Nome do projeto: " + packageJson.name)
 })
-
-app.get("/alunos", alunosController.getAlunos);
-
-app.get("/alunos/:id", alunosController.getAlunosById);
-
-app.post("/alunos", alunosController.createAluno);
-
-app.put("/alunos/:id", alunosController.updateAluno);
-
-app.delete("/alunos/:id", alunosController.deleteAluno);
-
-   
 
 app.listen(port, host, () => {
     console.log(`Servidor rodando na porta ${port}`);

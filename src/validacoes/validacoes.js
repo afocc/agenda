@@ -58,6 +58,13 @@ const validaCpf = ({ cpf }) => {
         
 }
 
+// const validaData = ({ datanascimento }) => {
+        
+//         if {
+
+//         }   
+// }
+
 module.exports = {
     validarAluno,
     validaCpf
