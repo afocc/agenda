@@ -32,40 +32,66 @@ const validaCpf = ({ cpf }) => {
 
     cpf = cpf.replaceAll('.', '').replaceAll('-', '');
 
-        if (cpf.length != 11 || cpf == "00000000000" || cpf == "11111111111" ||
-            cpf == "22222222222" || cpf == "33333333333" || cpf == "44444444444" ||
-            cpf == "55555555555" || cpf == "66666666666" || cpf == "77777777777" ||
-            cpf == "88888888888" || cpf == "99999999999" || cpf == "01234567890".test(cpf)){
+    if (cpf.length != 11){
             return false;
-        };
+    };
 
-        let soma = 0;
-        for (let i = 0; i < 9; i++) {
-            soma+= parseInt(cpf.charAt(i)) * (10 - i);                
-        } 
-        let dv1 = 11 - (soma % 11);
-        dv1 = dv1 >= 10 ? 0 : dv1;
+    const primeiroDigito = cpf[0];
+    if (cpf.split('').every(digito => digito === primeiroDigito)) {
+        return 'CPF inválido';
+    }
 
-        soma = 0;
-        for (let i = 0; i < 9; i++) {
-            soma+= parseInt(cpf.charAt(i)) * (11 - i);
-        }
-        soma += dv1 * 2;
-        let dv2 = 11 - (soma % 11);   
-        dv2 = dv2 >= 10 ? 0 : dv2;       
+    let soma = 0;
+    for (let i = 0; i < 9; i++) {
+        soma+= parseInt(cpf.charAt(i)) * (10 - i);                
+    } 
 
-        return cpf.charAt(9) == dv1 && cpf.charAt(10) == dv2;
+    let dv1 = 11 - (soma % 11);
+    dv1 = dv1 >= 10 ? 0 : dv1;
+
+    soma = 0;
+    for (let i = 0; i < 9; i++) {
+    soma+= parseInt(cpf.charAt(i)) * (11 - i);
+    }
+
+    soma += dv1 * 2;
+    let dv2 = 11 - (soma % 11);   
+    dv2 = dv2 >= 10 ? 0 : dv2;       
+
+    return cpf.charAt(9) == dv1 && cpf.charAt(10) == dv2;
         
 }
 
-// const validaData = ({ datanascimento }) => {
-        
-//         if {
+const validaData = ({ datanascimento }) => {
+      
+    if (!datanascimento) {
+        return 'Data de nascimento não pode estar vazia';
+    }
 
-//         }   
-// }
+    const data = new Date(datanascimento);
+    const hoje = new Date();
+
+    // let idade = hoje.getFullYear() - dataNascimento.getFullYear();
+    // const mesAtual = hoje.getMonth();
+    // const diaAtual = hoje.getDate();
+
+    // const mesNascimento = dataNascimento.getMonth();
+    // const diaNascimento = dataNascimento.getDate();
+      
+    const idadeMs = hoje.getTime() - data.getTime();
+    const idadeSegundos = idadeMs / 1000;
+    const idade = (idadeSegundos / 31536000).toFixed(1);
+
+    if (idade < 18){
+        return 'O aluno deve ser maior de 18 anos';
+    }
+
+    return;
+
+}
 
 module.exports = {
     validarAluno,
-    validaCpf
+    validaCpf,
+    validaData
 };

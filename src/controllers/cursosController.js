@@ -40,6 +40,7 @@ exports.createCurso = async (req, res) => {
 exports.updateCurso = async (req, res) => {
     const idCurso = req.params.id_curso;
     let { nome_curso } = req.body;
+    
     try {
         const curso = await cursosModel.updateCurso(idCurso, nome_curso);
         if (curso.rowCount === 0) {

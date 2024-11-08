@@ -1,5 +1,5 @@
 const alunosModel = require('../models/alunosModel');
-const { validarAluno, validaCpf } = require('../validacoes/validacoes')
+const { validarAluno, validaCpf, validaData} = require('../validacoes/validacoes')
 
 exports.getAlunos = async (req, res) => {
     try {
@@ -24,24 +24,30 @@ exports.getAlunoById = async (req, res) => {
 exports.createAluno = async (req, res) => { 
     let { nome, cpf, email, datanascimento } = req.body;
 
-    if (!req.body) {
-        return res.status(400).json({ message: 'Nenhum dado enviado' });
-    }
-
-    const erroAluno = validarAluno(req.body);
-    
-    if (erroAluno) {
-        return res.status(400).json({ message: erroAluno });
-    }
-
-    if (!validaCpf(req.body.cpf)) {
-        return res.status(400).json({ message: 'CPF inválido' });
-    }
-
     try {
+        if (!req.body) {
+            // return res.status(400).json({ message: 'Nenhum dado enviado' });
+            throw new Error('Nenhum dado enviado')
+        }
+
+        const erroAluno = validarAluno(req.body);    
+        if (erroAluno) {
+            return res.status(400).json({ message: erroAluno });
+        }
+
+        const erroCpf = validaCpf(req.body.cpf);
+        if (!validaCpf(req.body.cpf)) {
+            return res.status(400).json({ message: erroCpf });
+        }
+
+        const erroData = validaData({ datanascimento: req.body.datanascimento });
+        if (erroData){
+            return res.status(400).json({ message: erroData });
+        }
+        
         const novoAluno = await alunosModel.createAluno(nome, cpf, email, datanascimento);
         const idAluno = novoAluno.rows[0].id;
-        res.status(201).json({ message: `Aluno criado com sucesso`, id: idAluno });
+        res.status(201).json({ message: `Aluno criado com sucesso`, id: idAluno });        
     } catch (error) {
         console.error('Erro ao criar aluno:', error);
         res.status(500).json({ message: 'Erro ao criar aluno' });
