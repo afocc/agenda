@@ -1,5 +1,5 @@
 const alunosModel = require('../models/alunosModel');
-const { validarAluno, validaCpf, validaData} = require('../validacoes/validacoes')
+const { validarAluno, validaCpf, validaData } = require('../validacoes/validacoes')
 
 exports.getAlunos = async (req, res) => {
     try {
@@ -56,7 +56,7 @@ exports.createAluno = async (req, res) => {
     
 exports.updateAluno = async (req, res) => {    
     const idAluno = req.params.id;
-    let { nome, cpf, email, datanascimento } = req.body;
+    let { nome, cpf, email, datanascimento, senha } = req.body;
 
     if (!req.body) {
         return res.status(400).json({ message: 'Nenhum dado enviado' });
@@ -73,7 +73,7 @@ exports.updateAluno = async (req, res) => {
     }
 
     try {
-        const aluno = alunosModel.updateAluno(idAluno, nome, cpf, email, datanascimento);
+        const aluno = alunosModel.updateAluno(idAluno, nome, cpf, email, datanascimento, senha);
         if (aluno.rowsCount === 0) {
             return res.status(404).json({ message: 'Aluno não encontrado' });
         }     

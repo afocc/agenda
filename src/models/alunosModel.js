@@ -1,4 +1,5 @@
 const pool = require('../../db');
+const bcrypt = require('bcrypt'); 
 
 const getAlunos = async () => {
     try {
@@ -27,12 +28,15 @@ const createAluno = async (nome, cpf, email, datanascimento) => {
     } 
 };
 
-const updateAluno = async (id, nome, cpf, email, datanascimento) => {
+const updateAluno = async (id, nome, cpf, email, datanascimento, senha) => {
     console.log(id);
+
+    const hashedPassword = await bcrypt.hash(senha, 10);
+
     try {
     return await pool.query(
-        "UPDATE alunos SET nome = $1, cpf = $2, email = $3, datanascimento = $4 WHERE id = $5",
-        [nome, cpf, email, datanascimento, id]);
+        "UPDATE alunos SET nome = $1, cpf = $2, email = $3, datanascimento = $4, senha = $5 WHERE id = $6",
+        [nome, cpf, email, datanascimento, hashedPassword, id]);
     } catch {
         throw new Error("Erro ao atualizar aluno na model");
     }

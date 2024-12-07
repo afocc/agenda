@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const pool = require('./db');
 const app = express();
@@ -22,7 +23,7 @@ app.use('/turmas', turmasRoutes);
 
 app.get("/", (req, res) => {
     res.send("Nome do projeto: " + packageJson.name)
-})
+});
 
 app.listen(port, host, () => {
     console.log(`Servidor rodando na porta ${port}`);

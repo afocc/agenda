@@ -68,19 +68,31 @@ const validaData = ({ datanascimento }) => {
         return 'Data de nascimento não pode estar vazia';
     }
 
-    const data = new Date(datanascimento);
+    const dataNascimento = new Date(datanascimento);
     const hoje = new Date();
+    
+    // .toLocaleString("en-US", {timeZone: "America/Sao_Paulo"})
 
-    // let idade = hoje.getFullYear() - dataNascimento.getFullYear();
-    // const mesAtual = hoje.getMonth();
-    // const diaAtual = hoje.getDate();
+    console.log(hoje);
 
-    // const mesNascimento = dataNascimento.getMonth();
-    // const diaNascimento = dataNascimento.getDate();
+    let idade = hoje.getFullYear() - dataNascimento.getFullYear();
+    const mesAtual = hoje.getMonth();
+    const diaAtual = hoje.getDate();
+
+    const mesNascimento = dataNascimento.getMonth();
+    const diaNascimento = dataNascimento.getDate();
+
+    if (mesAtual < mesNascimento || (mesAtual === mesNascimento && diaAtual < diaNascimento)) {
+        idade--;
+    }
       
-    const idadeMs = hoje.getTime() - data.getTime();
-    const idadeSegundos = idadeMs / 1000;
-    const idade = (idadeSegundos / 31536000).toFixed(1);
+    // const idadeMs = hoje.getTime() - data.getTime();
+    // const idadeSegundos = idadeMs / 1000;
+    // const idade = (idadeSegundos / 31536000);
+
+
+
+    console.log(idade);
 
     if (idade < 18){
         return 'O aluno deve ser maior de 18 anos';
